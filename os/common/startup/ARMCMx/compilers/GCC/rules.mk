@@ -170,6 +170,11 @@ CPPFLAGS += -MD -MP -MF $(DEPDIR)/$(@F).d
 # Paths where to search for sources
 VPATH     = $(SRCPATHS)
 
+COLOR       = \033[1;34m
+COLOR_CLEAR = \033[0m
+
+COLOR_PRINTF = printf "$(COLOR)%s$(COLOR_CLEAR)\n"
+
 #
 # Makefile rules
 #
@@ -184,9 +189,9 @@ $(OBJS): | $(BUILDDIR) $(OBJDIR) $(LSTDIR) $(DEPDIR)
 
 $(BUILDDIR):
 ifneq ($(USE_VERBOSE_COMPILE),yes)
-	@echo Compiler Options
-	@echo $(CC) -c $(CFLAGS) -I. $(IINCDIR) main.c -o main.o
-	@echo
+	@$(COLOR_PRINTF) "Compiler Options"
+	@$(COLOR_PRINTF) $(CC) -c $(CFLAGS) -I. $(IINCDIR) main.c -o main.o
+	@$(COLOR_PRINTF)
 endif
 	@mkdir -p $(BUILDDIR)
 
@@ -204,7 +209,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(CPPC) -c $(CPPFLAGS) $(AOPT) -I. $(IINCDIR) $< -o $@
 else
-	@echo Compiling $(<F)
+	@$(COLOR_PRINTF) "Compiling $(<F)"
 	@$(CPPC) -c $(CPPFLAGS) $(AOPT) -I. $(IINCDIR) $< -o $@
 endif
 
@@ -213,7 +218,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(CPPC) -c $(CPPFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 else
-	@echo Compiling $(<F)
+	@$(COLOR_PRINTF) "Compiling $(<F)"
 	@$(CPPC) -c $(CPPFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 endif
 
@@ -222,7 +227,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(CC) -c $(CFLAGS) $(AOPT) -I. $(IINCDIR) $< -o $@
 else
-	@echo Compiling $(<F)
+	@$(COLOR_PRINTF) "Compiling $(<F)"
 	@$(CC) -c $(CFLAGS) $(AOPT) -I. $(IINCDIR) $< -o $@
 endif
 
@@ -231,7 +236,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(CC) -c $(CFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 else
-	@echo Compiling $(<F)
+	@$(COLOR_PRINTF) "Compiling $(<F)"
 	@$(CC) -c $(CFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 endif
 
@@ -240,7 +245,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(AS) -c $(ASFLAGS) -I. $(IINCDIR) $< -o $@
 else
-	@echo Compiling $(<F)
+	@$(COLOR_PRINTF) "Compiling $(<F)"
 	@$(AS) -c $(ASFLAGS) -I. $(IINCDIR) $< -o $@
 endif
 
@@ -249,7 +254,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(CC) -c $(ASXFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 else
-	@echo Compiling $(<F)
+	@$(COLOR_PRINTF) "Compiling $(<F)"
 	@$(CC) -c $(ASXFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 endif
 
@@ -258,7 +263,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(LD) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
 else
-	@echo Linking $@
+	@$(COLOR_PRINTF) "Linking $@"
 	@$(LD) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
 endif
 
@@ -266,7 +271,7 @@ endif
 ifeq ($(USE_VERBOSE_COMPILE),yes)
 	$(HEX) $< $@
 else
-	@echo Creating $@
+	@$(COLOR_PRINTF) "Creating $@"
 	@$(HEX) $< $@
 endif
 
@@ -274,7 +279,7 @@ endif
 ifeq ($(USE_VERBOSE_COMPILE),yes)
 	$(BIN) $< $@
 else
-	@echo Creating $@
+	@$(COLOR_PRINTF) "Creating $@"
 	@$(BIN) $< $@
 endif
 
@@ -283,7 +288,7 @@ ifdef SREC
   ifeq ($(USE_VERBOSE_COMPILE),yes)
 	$(SREC) $< $@
   else
-	@echo Creating $@
+	@$(COLOR_PRINTF) "Creating $@"
 	@$(SREC) $< $@
   endif
 endif
@@ -293,7 +298,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	$(OD) $(ODFLAGS) $< > $@
 	$(SZ) $<
 else
-	@echo Creating $@
+	@$(COLOR_PRINTF) "Creating $@"
 	@$(OD) $(ODFLAGS) $< > $@
 	@echo
 	@$(SZ) $<
@@ -303,10 +308,10 @@ endif
 ifeq ($(USE_VERBOSE_COMPILE),yes)
 	$(OD) -d $< > $@
 else
-	@echo Creating $@
+	@$(COLOR_PRINTF) "Creating $@"
 	@$(OD) -d $< > $@
 	@echo
-	@echo Done
+	@$(COLOR_PRINTF) "Done"
 endif
 
 lib: $(OBJS) $(BUILDDIR)/lib$(PROJECT).a
@@ -314,17 +319,17 @@ lib: $(OBJS) $(BUILDDIR)/lib$(PROJECT).a
 $(BUILDDIR)/lib$(PROJECT).a: $(OBJS)
 	@$(AR) -r $@ $^
 	@echo
-	@echo Done
+	@$(COLOR_PRINTF) Done
 
 clean: CLEAN_RULE_HOOK
-	@echo Cleaning
-	@echo - $(DEPDIR)
+	@$(COLOR_PRINTF) Cleaning
+	@$(COLOR_PRINTF) - $(DEPDIR)
 	@-rm -fR $(DEPDIR)/* $(BUILDDIR)/* 2>/dev/null
 	@-if [ -d "$(DEPDIR)" ]; then rmdir -p --ignore-fail-on-non-empty $(subst ./,,$(DEPDIR)) 2>/dev/null; fi
-	@echo - $(BUILDDIR)
+	@$(COLOR_PRINTF) - $(BUILDDIR)
 	@-if [ -d "$(BUILDDIR)" ]; then rmdir -p --ignore-fail-on-non-empty $(subst ./,,$(BUILDDIR)) 2>/dev/null; fi
 	@echo
-	@echo Done
+	@$(COLOR_PRINTF) "Done"
 
 CLEAN_RULE_HOOK:
 
