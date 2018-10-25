@@ -301,10 +301,10 @@ endif
 
 %.list: %.elf
 ifeq ($(USE_VERBOSE_COMPILE),yes)
-	$(OD) -S $< > $@
+	$(OD) -d $< > $@
 else
 	@echo Creating $@
-	@$(OD) -S $< > $@
+	@$(OD) -d $< > $@
 	@echo
 	@echo Done
 endif
